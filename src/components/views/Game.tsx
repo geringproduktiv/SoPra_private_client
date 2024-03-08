@@ -8,10 +8,9 @@ import PropTypes from "prop-types";
 import "styles/views/Game.scss";
 import { User } from "types";
 
-const Player = ({ user }: { user: User }) => (
-  <div className="player container">
+const Player = ({ user, navigate }: { user: User; navigate: any }) => (
+  <div className="player container" onClick={() => navigate(`/profile/${user.id}`)}>
     <div className="player username">{user.username}</div>
-    <div className="player name">{user.name}</div>
     <div className="player id">id: {user.id}</div>
   </div>
 );
@@ -87,7 +86,7 @@ const Game = () => {
         <ul className="game user-list">
           {users.map((user: User) => (
             <li key={user.id}>
-              <Player user={user} />
+              <Player user={user} navigate={navigate} />
             </li>
           ))}
         </ul>
@@ -102,7 +101,7 @@ const Game = () => {
     <BaseContainer className="game container">
       <h2>Happy Coding!</h2>
       <p className="game paragraph">
-        Get all users from secure endpoint:
+        users overview
       </p>
       {content}
     </BaseContainer>

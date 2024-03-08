@@ -33,45 +33,36 @@ FormField.propTypes = {
   onChange: PropTypes.func,
 };
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
   const [password, setPassword] = useState<string>(null);
 
-  const doLogin = async () => {
+  const doRegister = async () => {
     try {
 
-      // Request Body (username and password)
-      const requestBody = JSON.stringify({ username, password });
-
-      // Send a POST request to the server to validate the login credentials
-      const response = await api.post("/user-validation", requestBody);
-
-      // Get the returned user token
-      const token = response.data.token;
-
-      // If token is null, the login failed --> show an error message
-      if (!token) {
-        alert("Login failed. Please check your credentials.");
-
-        return;
-      }
+      const requestBody = JSON.stringify({ username, password, name });
+      const response = await api.post("/users", requestBody);
+      
+      // Get the returned user and update a new object.
+      const user = new User(response.data);
 
       // Store the token into the local storage.
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", user.token);
 
-      // Login successfully worked --> navigate to the route /game in the GameRouter
+      // Registration successfully worked --> navigate to the route /game in the GameRouter
       navigate("/game");
     } catch (error) {
       alert(
-        `Something went wrong during the login: \n${handleError(error)}`
+        `Something went wrong during the registration: \n${handleError(error)}`
       );
     }
   };
 
-  const navigatetoRegister = () => {
-    // Navigate to the registration page
-    navigate("/register");
+  const navigateToLogin = () => {
+    // Navigate to the login page.
+    navigate("/login");
   }
 
   return (
@@ -84,25 +75,31 @@ const Login = () => {
             onChange={(un: string) => setUsername(un)}
           />
           <FormField
+            label="Name"
+            value={name}
+            onChange={(n: string) => setName(n)}
+          />
+          <FormField
             label="Password"
             value={password}
-            onChange={(n: string) => setPassword(n)}
+            onChange={(p: string) => setPassword(p)}
           />
           <div className="login button-container">
             <Button
               disabled={!username || !password}
               width="100%"
-              onClick={() => doLogin()}
-            >
-              Login
-            </Button>
-          </div>
-          <div className="register-container" style={{marginTop: "20px", textAlign: "center"}}>
-            <span>You do not have an account? </span>
-            <Button 
-              onClick={navigatetoRegister}
+              onClick={() => doRegister()}
             >
               Register
+            </Button>
+          </div>
+          
+          <div className="login-container" style={{marginTop: "20px", textAlign: "center"}}>
+            <span>You already have an account? </span>
+            <Button 
+              onClick={navigateToLogin}
+            >
+              Login
             </Button>
           </div>
         </div>
@@ -114,4 +111,4 @@ const Login = () => {
 /**
  * You can get access to the history object's properties via the useLocation, useNavigate, useParams, ... hooks.
  */
-export default Login;
+export default Register;

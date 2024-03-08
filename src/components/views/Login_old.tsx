@@ -19,7 +19,7 @@ const FormField = (props) => {
       <label className="login label">{props.label}</label>
       <input
         className="login input"
-        placeholder="enter here..."
+        placeholder="enter here.."
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
       />
@@ -35,30 +35,19 @@ FormField.propTypes = {
 
 const Login = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState<string>(null);
   const [username, setUsername] = useState<string>(null);
-  const [password, setPassword] = useState<string>(null);
 
   const doLogin = async () => {
     try {
+      const requestBody = JSON.stringify({ username, name });
+      const response = await api.post("/users", requestBody);
 
-      // Request Body (username and password)
-      const requestBody = JSON.stringify({ username, password });
-
-      // Send a POST request to the server to validate the login credentials
-      const response = await api.post("/user-validation", requestBody);
-
-      // Get the returned user token
-      const token = response.data.token;
-
-      // If token is null, the login failed --> show an error message
-      if (!token) {
-        alert("Login failed. Please check your credentials.");
-
-        return;
-      }
+      // Get the returned user and update a new object.
+      const user = new User(response.data);
 
       // Store the token into the local storage.
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", user.token);
 
       // Login successfully worked --> navigate to the route /game in the GameRouter
       navigate("/game");
@@ -68,11 +57,6 @@ const Login = () => {
       );
     }
   };
-
-  const navigatetoRegister = () => {
-    // Navigate to the registration page
-    navigate("/register");
-  }
 
   return (
     <BaseContainer>
@@ -84,25 +68,17 @@ const Login = () => {
             onChange={(un: string) => setUsername(un)}
           />
           <FormField
-            label="Password"
-            value={password}
-            onChange={(n: string) => setPassword(n)}
+            label="Name"
+            value={name}
+            onChange={(n) => setName(n)}
           />
           <div className="login button-container">
             <Button
-              disabled={!username || !password}
+              disabled={!username || !name}
               width="100%"
               onClick={() => doLogin()}
             >
               Login
-            </Button>
-          </div>
-          <div className="register-container" style={{marginTop: "20px", textAlign: "center"}}>
-            <span>You do not have an account? </span>
-            <Button 
-              onClick={navigatetoRegister}
-            >
-              Register
             </Button>
           </div>
         </div>
